@@ -1,0 +1,163 @@
+<!-- MODALS -->
+<%= if @modal != "" do %>
+  <div class="modal">
+    <% size_modal = if @modal == "deposit" do "medium" else "small" end %>
+    <div class="modal-<%= size_modal %>">
+      <div class="uk-text-right" phx-click="modal" phx-value-value=""> <i class="fa-solid fa-xmark uk-cursor-pointer"></i> </div>
+      <div class="uk-text-center">
+        <%= case @modal do %>
+          <% "deposit" -> %>
+            <%= live_render(@socket,  WpSalsaWeb.DepositLive, id: "deposit_modal", session: %{ "locale" => Gettext.get_locale(), "publicKey" => @publicKey, "available" => @usdc_data["amount"], "min_deposit_allowed" => @min_deposit_allowed, "apy_20_from" => @apy_20_from}) %>
+          <% "claming" -> %>
+            <i class="fa-solid fa-hand-holding-dollar" style="font-size: 100px; color: #66666650"></i>
+            <h2 class="uk-text-bold" style="padding-top:20px"> You are claming <%= 1 %> USDC </h2>
+            <h3 class="uk-text-muted" style="padding-top:10px"> This may take a few moments to process! </h3>
+            <div class="uk-flex uk-flex-center" >
+              <%= if @loading_in_modal do %>
+                <button type="button" class="uk-button-salsa-loading" style="margin-top: 40px; max-width: 250px!important" disabled>  loading...  </button>
+              <% else %>
+                <div class="uk-button-salsa" style="margin-top: 40px; max-width: 250px!important" phx-hook="claimRewards" id="claimRewards" data-page="0.1"> Claim USDC now </div>
+                <div class="uk-button-salsa" style="margin-top: 40px; max-width: 250px!important" phx-click="claimRewards" phx-value-id="001"> Claim since controller </div>
+
+              <% end %>
+            </div>
+          <% "redemption" -> %>
+            <i class="fa-solid fa-money-simple-from-bracket" style="font-size: 100px; color: #66666650"></i>
+            <h2 class="uk-text-bold" style="padding-top:20px"> Redemption <%= 1 %> USDC </h2>
+            <h3 class="uk-text-muted" style="padding-top:10px"> This may take a few moments to process! </h3>
+            <div class="uk-flex uk-flex-center" >
+              <%= if @loading_in_modal do %>
+                <button type="button" class="uk-button-salsa-loading" style="margin-top: 40px; max-width: 250px!important" disabled>  loading...  </button>
+              <% else %>
+                <div class="uk-button-salsa" style="margin-top: 40px; max-width: 250px!important" phx-hook="claimRewards" id="claimRewards" data-page="0.1"> Redemption USDC now </div>
+              <% end %>
+            </div>
+          <% "confirmed" -> %>
+            <div class="uk-text-center">
+              <i class="fa-solid fa-circle-check" style="font-size: 90px; color: #FF4200"></i>
+              <h2 style="padding-top: 20px" class="uk-margin-remove uk-text-bold"> Transaction submitted </h2>
+              <p >This may take a few moments to process!</p>
+            </div>
+            <div class="uk-resumen-staking">
+              <div class="uk-flex uk-flex-middle">
+                <h3 class="uk-text-center uk-text-truncate"> <%= @data %> </h3>
+                <div class="uk-cursor-pointer" phx-hook="copyToClipboard" data-page="<%= @data %>" id="copy_transactionID"> <i class="fa-solid fa-copy uk-padding-horizontal-10 uk-color-salsa"></i> </div>
+              </div>
+            </div>
+            <div class="uk-flex uk-flex-around uk-flex-middle" style="padding-top: 30px">
+              <a href="https://solscan.io/tx/<%= @data %>" target="_blank"> <h3 class="uk-color-salsa uk-cursor-pointer"> View on Explorer </h3> </a>
+              <button class="uk-button-salsa" style="max-width: 200px !important" phx-click="modal" phx-value-value=""> Close </button>
+            </div>
+          <% "no_phantom" -> %>
+            <img src='<%= Routes.static_path(@socket, "/images/phantom.png") %>' alt="" style="height: 50px">
+            <h2 class="uk-text-bold" style="padding-top:20px"> Install Phantom Wallet to perform this action </h2>
+            <h3 class="uk-text-muted" style="padding-top:10px"> You do not have Phantom Wallet. </h3>
+            <a href="https://phantom.app/download" target="_blank" > <h3 style="padding-top: 20px; color: blue"> Download </h3>  </a>
+          <% "rejected" -> %>
+            <i class="fa-solid fa-xmark" style="font-size: 100px; color: red"></i>
+            <h2 class="uk-text-bold" style="padding-top:20px"> You rejected the request </h2>
+            <h3 class="uk-text-light" style="padding-top:10px"> We cannot continue, you have rejected the request with the Phantom wallet </h3>
+            <div class="uk-flex uk-flex-center">
+              <div style="width: 250px; padding-top: 40px; padding-bottom: 20px" phx-click="modal" phx-value-value=""> <div class="uk-button-salsa uk-modal-close"> Close </div> </div>
+            </div>
+          <% _ -> %>
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 100px; color: red"></i>
+            <h2 class="uk-text-bold" style="padding-top:20px"> Something went wrong </h2>
+            <h3 class="uk-text-light" style="padding-top:10px"> We are having problems, please try again in a few minutes </h3>
+            <div class="uk-flex uk-flex-center">
+              <div style="width: 250px; padding-top: 40px; padding-bottom: 20px" phx-click="modal" phx-value-value=""> <div class="uk-button-salsa uk-modal-close"> Close </div> </div>
+            </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+
+<% scroll_home = if @modal != "" do "height: 100vh; overflow-y: hidden; padding: 0px; margin: 0px" else "" end %>
+<div style="<%= scroll_home %>">
+  <!-- MENU -->
+  <div style="background-color: #EFDBC2 ; width: 100%;">
+    <div style="max-width: 1300px; margin-left: auto; margin-right: auto; padding: 20px;">
+      <div class="uk-flex uk-flex-between uk-flex-middle" style="width: 100%; margin-bottom: 10px">
+        <a phx-click="tab" phx-value-tab="deposit"><img src='<%= Routes.static_path(@socket, "/images/logo.png") %>' alt="" class="uk-icon-salsa"></a>
+        <div class="uk-flex uk-flex-middle">
+          <%= if !@loading_crm && !@loading do %>
+            <h3 class="uk-margin-remove uk-padding-small uk-link-hover-salsa <%= if @tab == "deposit" do "active" end %>" phx-click="tab" phx-value-tab="deposit"> Earn </h3>
+            <h3 class="uk-margin-remove uk-padding-small uk-link-hover-salsa <%= if @tab == "about" do "active" end %>" phx-click="tab" phx-value-tab="about"> About </h3>
+            <h3 class="uk-margin-remove uk-padding-small uk-link-hover-salsa <%= if @tab == "terms" do "active" end %>" phx-click="tab" phx-value-tab="terms" > Terms and Conditions </h3>
+          <% end %>
+          <%= cond do %>
+            <% @loading_crm -> %>
+              <div class="button-loading animate"> </div>
+            <% @error_salsa_account -> %>
+            <% @loading -> %>
+              <div class="uk-visible@s"> <button class="uk-button-salsa-connect" style="background-color: #FF420050;" disabled> Loading...  </button> </div>
+            <% @publicKey != nil -> %>
+              <div class="uk-visible@s"> <button class="uk-button-salsa-connect uk-flex uk-flex-middle" phx-hook="phantomDisconnect"  phx-update="ignore" id="phantomDisconnect1"> <i class="fa-solid fa-arrow-right-from-bracket" style="padding-right: 10px"></i> Close wallet <div class="uk-hash-container-button" style="margin-left: 10px!important"> <%= String.slice(@publicKey, 0, 15)  %>... </div> </button> </div>
+            <% true -> %>
+              <div class="uk-visible@s"> <button class="uk-button-salsa-connect" phx-hook="<%= if @is_phantom_pre_connection do "phantomPreConnect" else "phantomConnect" end %>" phx-update="ignore" id="phantomConnect1"> Connect to Phantom Wallet <i class="fa-light fa-wallet"></i> </button> </div>
+          <% end %>
+        </div>
+      </div>
+      <%= if @tab == "deposit" do %>
+        <img src='<%= Routes.static_path(@socket, "/images/cover-salsa.jpg") %>' style="object-fit: scale-down; width: 100% !important; height: auto!important; margin-top: 20px" alt="" class="uk-icon-salsa">
+      <% end %>
+    </div>
+  </div>
+  <!-- BODY -->
+    <%= cond do %>
+      <% @loading_crm -> %>
+        <div style="max-width: 1300px; margin-left: auto; margin-right: auto; padding: 20px;">
+          <%= render("loading.html", assigns) %>
+        </div>
+      <% @error_salsa_account || @error_wallet -> %>
+        <div style="max-width: 1300px; margin-left: auto; margin-right: auto; padding: 20px;">
+          <div class="uk-text-center" style="padding-top:100px">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 100px; color: red"></i>
+            <h2 class="uk-text-bold" style="padding-top:20px"> Something went wrong </h2>
+            <h3 class="uk-text-light" style="padding-top:10px"> We are having problems, please try again in a few minutes </h3>
+          </div>
+        </div>
+      <% @tab == "about" -> %>
+        <%= render("about.html", assigns) %>
+      <% @tab == "terms" -> %>
+        <div style="max-width: 1300px; margin-left: auto; margin-right: auto; padding: 20px;">
+          <%= render("terms.html", assigns) %>
+        </div>
+      <% true -> %>
+        <div style="max-width: 1300px; margin-left: auto; margin-right: auto; padding: 20px;">
+          <%= render("dashboard.html", assigns) %>
+        </div>
+    <% end %>
+</div>
+
+<!-- FOOTER -->
+<div class="uk-footer-salsa">
+  <div style="max-width: 1300px; margin-left: auto; margin-right: auto; padding: 0px 20px 0px 20px;">
+    <div class="uk-flex uk-flex-bottom">
+      <img style="height: 30px; margin-bottom: 4px" src='<%= Routes.static_path(@socket, "/images/salsa_blanco.png") %>' alt="" class="uk-icon-salsa">
+      <h2 style="color: #fff; margin: 0px; padding-left: 5px; padding-right: 5px"> / </h2>
+      <a href="https://latinverse.co/" target="_blank"> <img style="height: 30px; margin-bottom: 4px" src='<%= Routes.static_path(@socket, "/images/latinverse.png") %>' alt="" class="uk-icon-salsa"> </a>
+    </div>
+    <div class="uk-flex uk-flex-between uk-flex-middle" style="padding-top: 20px">
+      <div>
+        <h3 style="color: #fff;"> hello@salsa.financial </h3>
+        <div class="uk-flex">
+          <a href="https://www.twitter.com/latinverseco" target="_blank" class="uk-icon-social-media-foot"><i class="fa-brands fa-twitter"></i> </a>
+          <a href="https://www.instagram.com/latinverse.co/" target="_blank" class="uk-icon-social-media-foot"> <i class="fa-brands fa-instagram-square"></i> </a>
+          <a href="https://www.tiktok.com/@pachoman.eth?lang=en" target="_blank" class="uk-icon-social-media-foot"><i class="fa-brands fa-tiktok"></i> </a>
+        </div>
+      </div>
+      <div>
+        <h3 class="uk-link-footer" phx-click="tab" phx-value-tab="deposit" uk-scroll> Earn </h3>
+        <h3 class="uk-link-footer" phx-click="tab" phx-value-tab="about" uk-scroll> About </h3>
+        <h3 class="uk-link-footer" phx-click="tab" phx-value-tab="terms" uk-scroll> Terms & conditions </h3>
+      </div>
+      <div></div>
+    </div>
+    <h3 style="color: #fff; margin-top: 20px;"> Salsa is not a bank, depository institution, custodian or fiduciary and the assets in your Salsa account are not insured by any private or governmental insurance plan, nor are they covered by any compensation scheme. </h3>
+    <h3 style="color: #fff; margin-top: 10px;"> Holding, trading or using crypto assets carry significant risks, please carefully read our <span class="uk-link-footer" phx-click="tab" phx-value-tab="terms" uk-scroll> Terms and conditions</span>. Salsa does not provide any financial, legal or tax advice. This website should not be understood as an offer or inducement to make any financial decisions. This DEFI platform has been created by Latinverse for educational purposes only. So anyone could learn how to use DEFI products, powered by the Solana Blockchain. </h3>
+    <h3 class="" style="color: #fff; margin-top: 20px;"> ©2022 Salsa - <a class="uk-link-footer" href="https://latinverse.co/" target="_blank"> Latinverse </a>  -  <span class="uk-link-footer" phx-click="tab" phx-value-tab="terms" uk-scroll> Terms and conditions</span> </h3>
+  </div>
+</div>

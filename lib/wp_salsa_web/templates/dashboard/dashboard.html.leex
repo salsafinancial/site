@@ -1,0 +1,179 @@
+<div class="uk-flex uk-flex-between uk-flex-top" style="padding-top: 30px">
+  <div>
+    <h3 class="uk-margin-remove uk-text-light" style="font-size: 22px"> Total deposited </h3>
+    <h1 class="uk-margin-remove uk-text-bold" style="font-size: 35px"> USDC <%= if @salsa_account != nil do :erlang.float_to_binary(Float.parse(@salsa_account["totalAmount"]) |> elem(0), [decimals: 2]) else "--" end %> </h1>
+  </div>
+  <div>
+    <h3 class="uk-margin-remove uk-text-light uk-text-right" style="font-size: 22px"> Total rewards given </h3>
+    <h1 class="uk-margin-remove uk-text-bold uk-text-right" style="font-size: 35px"> USDC <%= if @salsa_account != nil do :erlang.float_to_binary(Float.parse(@salsa_account["paymentsMade"]) |> elem(0), [decimals: 2]) else "--" end  %> </h1>
+  </div>
+</div>
+<div class="uk-flex uk-flex-between uk-flex-top" style="padding-top: 30px">
+  <div>
+    <h3 class="uk-margin-remove uk-text-light" style="font-size: 22px"> Future rewards </h3>
+    <h1 class="uk-margin-remove uk-text-bold" style="font-size: 35px; max-width: 35vw"> USDC <%= if @salsa_account != nil do :erlang.float_to_binary(Float.parse(@salsa_account["futurePayments"]) |> elem(0), [decimals: 2]) else "--" end  %> </h1>
+  </div>
+  <div>
+    <h3 class="uk-margin-remove uk-text-light uk-text-right" style="font-size: 22px"> Estimated Rewards </h3>
+    <h1 class="uk-margin-remove uk-text-bold uk-text-right" style="font-size: 35px"> 10-20% APY <i class="fa-regular fa-circle-info" style="font-size: 30px" uk-tooltip="title: The annual percentage yield (APY) is the real rate of return earned on an investment, taking into account the effect of compounding interest. If the amount of the deposit is greater than to <%= @apy_20_from%> USDC the estimated reward is 20% otherwise it is 10% per year" ></i> </h1>
+
+  </div>
+</div>
+<div class="uk-flex uk-flex-between uk-flex-top" style="padding-top: 30px">
+  <div>
+    <h3 class="uk-margin-remove uk-text-light" style="font-size: 22px"> Time period </h3>
+    <h1 class="uk-margin-remove uk-text-bold" style="font-size: 30px; max-width: 35vw"> You can deposit your USDC in periods of 6 months or 1 year </h1>
+  </div>
+  <div>
+    <h3 class="uk-margin-remove uk-text-light uk-text-right" style="font-size: 22px"> Claimable Rewards </h3>
+    <h1 class="uk-margin-remove uk-text-bold uk-text-right" style="font-size: 30px; max-width: 35vw"> You can claim your rewards every 3 months </h1>
+  </div>
+</div>
+
+    <h1 class="uk-margin-remove" style="font-size: 30px; padding-top: 10vh"> Start depositing from $<%= @min_deposit_allowed %> USDC </h1>
+
+
+<div class="uk-flex uk-flex-wrap" style="padding-top: 40px">
+  <%=  if @publicKey == nil || @loading do %>
+    <div class="uk-card uk-card-default uk-card-body uk-width-1-2@m" style="padding: 20px !important; margin-top: 20px; margin-right: 10px">
+      <h2 class="uk-text-bold">My wallet</h2>
+      <div class="uk-flex" style="padding-top: 20px">
+        <div class="uk-width-1-2@m">
+          <h3 class="uk-text-muted uk-margin-remove"> TOTAL DEPOSITED </h3>
+          <h2 class="uk-margin-remove"> - - </h2>
+        </div>
+        <div class="uk-width-1-2@m">
+          <h3 class="uk-text-muted uk-margin-remove"> AVAILABLE IN WALLET </h3>
+          <h2 class="uk-margin-remove"> - - </h2>
+        </div>
+      </div>
+      <%= if @loading do %>
+        <div style="padding-top: 30px">
+          <button class="uk-button-salsa-connect" style="background-color: #FF420050" disabled>  Loading... </button>
+        </div>
+      <% else %>
+        <div style="padding-top: 30px">
+          <button class="uk-button-salsa-connect" phx-hook="phantomConnect" id="phantomConnect2"  phx-update="ignore">  Connect to Phantom Wallet <i class="fa-regular fa-wallet"></i> </button>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="uk-card uk-card-default uk-card-body uk-width-1-2@m" style="padding: 20px!important; margin-top: 20px; margin-right: 10px; min-height: 350px">
+      <div class="uk-flex uk-flex-middle">
+        <h2 class="uk-text-bold">My wallet</h2>
+        <div class="uk-hash-container" style="margin-left: 10px!important"> <%= String.slice(@publicKey, 0, 15)  %>... </div>
+      </div>
+      <div class="uk-flex" style="padding-top: 30px">
+        <div class="uk-width-1-2@m">
+          <h3 class="uk-text-muted uk-margin-remove"> TOTAL DEPOSITED </h3>
+          <div class="uk-flex uk-flex-bottom" style="padding-top: 10px">
+            <% deposited = if @wallet_account != nil do "USDC #{:erlang.float_to_binary(Float.parse(@wallet_account["totalAmount"] ) |> elem(0), [decimals: 3])}" else "--" end %>
+            <% deposited = if @wallet_account == nil && !@error_wallet do "USDC 0.0" else deposited end %>
+            <h1 class="uk-text-bold"> <%= deposited  %>  </h1>
+          </div>
+        </div>
+        <div class="uk-width-1-2@m">
+          <h3 class="uk-text-muted uk-margin-remove"> AVAILABLE IN WALLET </h3>
+          <div class="uk-flex uk-flex-bottom" style="padding-top: 10px">
+            <h1 class="uk-text-bold"> <%= if @usdc_data == nil do "USDC 0.0" else "USDC #{@usdc_data["amount"]}" end %> </h1>
+
+          </div>
+        </div>
+      </div>
+      <%= if length(@tokens_account) > 0 || @solanas > 0.0 do %>
+        <h3 class="uk-text-muted uk-margin-remove" style="padding-top: 20px; padding-bottom: 20px"> OTHER TOKENS IN MY WALLET </h3>
+        <div class="uk-flex uk-flex-wrap">
+          <%= if @solanas > 0.0 do %>
+            <img src='<%= Routes.static_path(@socket, "/images/icon_tokens/solana.png") %>' alt="" style="width: 40px; padding-right: 10px" uk-tooltip="You have <%= @solanas %> SOL">
+          <% end %>
+          <%= for i <- 0..(length(@tokens_account)-1) do %>
+            <% {icon_route, name} = get_icon_token(Enum.at(@tokens_account, i )["address"], Enum.at(@tokens_account, i )["amount"], @list_tokens, @socket) %>
+            <%= if icon_route != nil do %>
+              <img src='<%= icon_route %>' alt="" style="width: 40px; padding-right: 10px" uk-tooltip="<%= name %>">
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+      <div style="padding-bottom: 20px">
+        <%= cond do %>
+          <% @usdc_data == nil || @solanas < 0.00001 -> %>
+            <div class="uk-text-center" style="color: red; padding-top: 40px">
+              <%= if @usdc_data == nil do  "You don't have any USDC currently, please exchange your tokens for USDC and deposit them" else "You must have at least 0.00001 SOL to pay the transaction fee" end %>
+            </div>
+            <div style="padding-top:40px">
+              <button class="uk-button-salsa" style="background-color: #FF420050!important; " type="button" disabled> Deposit <i class="fa-regular fa-handshake" ></i> </button>
+            </div>
+          <% @usdc_data["amount"] < @min_deposit_allowed -> %>
+            <div class="uk-text-center" style="color: red; padding-top: 40px">
+              <%= "You have #{@usdc_data["amount"]} USDC, you need a minimum of #{@min_deposit_allowed} USDC to make a deposit" %>
+            </div>
+            <div style="padding-top:40px">
+              <button class="uk-button-salsa" style="background-color: #FF420050!important; " type="button" disabled> Deposit <i class="fa-regular fa-handshake" ></i> </button>
+            </div>
+          <% true -> %>
+            <div style="padding-top:40px">
+              <div class="uk-button-salsa" phx-click="modal" phx-value-value="deposit"> Deposit <i class="fa-regular fa-handshake"></i> </div>
+            </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  <!-- <%= if @publicKey != nil && !@loading && @wallet_account != nil do %>
+    <div class="uk-card uk-card-default uk-card-body uk-width-expand"style="padding: 20px !important; margin-top: 20px;  margin-left: 10px">
+      <h2 class="uk-text-bold">Balance</h2>
+      <div style="position: relative; height: 100%!important; margin-bottom: 20px; padding-top:30px">
+        <canvas style="height: 250px!important; width: 100%!important" phx-hook="LineChartIndexCore" phx-update="ignore" data-page="lineChartBalance|<%= Enum.join(format_data_chart(@wallet_account["dashboardData"]["days"], "future_payments"), ";") %>|<%= Enum.join(format_data_chart(@wallet_account["dashboardData"]["days"], "incomes"), ";") %>|<%= Enum.join(format_data_chart(@wallet_account["dashboardData"]["days"], "payments_made"), ";") %>|<%= Enum.join(list_balance_chart(@wallet_account["dashboardData"]["days"]), ";") %>|<%= Enum.join(get_labels_dashboard(@wallet_account["dashboardData"]["days"]), ";") %>|<%= Enum.max_by(list_balance_chart(@wallet_account["dashboardData"]["days"]), fn x -> x end) * 1.2 %>" id="lineChartBalance" ></canvas>
+      </div>
+    </div>
+  <% end %> -->
+</div>
+<%= if @transactions != nil && !@loading && !@loading_transactions && @wallet_account != nil do %>
+  <div class="uk-card uk-card-default uk-card-body uk-width-1-1" style="padding: 20px !important; margin-top: 20px; margin-bottom: 0px;" >
+    <h2 class="uk-text-bold">My Deposits</h2>
+    <%= if length(@transactions) > 0 do %>
+      <table class="uk-table uk-table-striped uk-table-small">
+        <thead>
+            <tr>
+                <th class="uk-visible@s"> <h3> ID Transaction </h3> </th>
+                <th> <h3> Deposited (USDC) </h3> </th>
+                <th> <h3> INITIAL DATE </h3> </th>
+                <th> <h3> TIME PERIOD </h3> </th>
+                <th> <h3> APY </h3> </th>
+                <th class="uk-visible@s"> <h3> REWARDS (USDC) </h3> </th>
+                <th class="uk-visible@s"> <h3> CLAIMABLE REWARDS </h3> </th>
+            </tr>
+        </thead>
+        <tbody>
+          <%= for tx <- @transactions do %>
+            <tr>
+                <td class="uk-visible@s uk-text-truncate uk-text-regular"> <a href="https://solscan.io/tx/<%= tx["code"] %>" target="_blank"> <%= tx["code"] %> </a> </td>
+                <td><%= :erlang.float_to_binary(Float.parse(tx["amount"]) |> elem(0), [decimals: 4]) %></td>
+                <td><%= format_date tx["date"] %></td>
+                <td><%= tx["period"] %> Months</td>
+                <td><%= tx["apy"] %>%</td>
+                <td class="uk-visible@s"><%= :erlang.float_to_binary(Float.parse(tx["rewards"]) |> elem(0), [decimals: 4]) %></td>
+                <td class="uk-visible@s"><%= format_date tx["nextPayment"] %> (in <%= remaining_days(tx["date"], tx["nextPayment"]) %> days)</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <h3 style="color:red; padding-top: 30px; padding-bottom: 30px" class="uk-text-center"> You have not made deposits yet </h3>
+    <% end %>
+  </div>
+<% else %>
+  <%= cond do %>
+    <% @loading_transactions -> %>
+      <div class="uk-card uk-card-default uk-card-body uk-width-1-1" style="padding: 20px !important; margin-top: 20px; margin-bottom: 0px;" >
+        <h2 class="uk-text-bold">My Deposits</h2>
+        <div class="box-transactions-loading animate" style="margin-top: 30px"> </div>
+        <div class="box-transactions-loading animate" style="margin-top: 10px"> </div>
+      </div>
+    <% @error_transactions -> %>
+      <div class="uk-card uk-card-default uk-card-body uk-width-1-1" style="padding: 20px !important; margin-top: 20px; margin-bottom: 0px;" >
+        <h2 class="uk-text-bold">My Deposits</h2>
+        <h3 style="color:red; padding-top: 30px; padding-bottom: 30px" class="uk-text-center"> Sorry, we were unable to load your deposits. Please try again in a few minutes </h3>
+      </div>
+    <% true -> %>
+  <% end %>
+<% end %>

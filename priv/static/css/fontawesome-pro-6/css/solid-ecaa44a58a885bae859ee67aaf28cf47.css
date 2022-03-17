@@ -1,0 +1,15 @@
+/*!
+ * Font Awesome Pro 6.0.0-beta1 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license (Commercial License)
+ */
+@font-face {
+  font-family: 'Font Awesome 6 Pro';
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("../webfonts/fa-solid-900-26623167aec96f742cf168c6f344150a.woff2?vsn=d") format("woff2"), url("../webfonts/fa-solid-900-e68a62d29893eeaf74a6493a31b94010.woff?vsn=d") format("woff"), url("../webfonts/fa-solid-900-b904f5cfacff1c9c3e5c9aaad62a494d.ttf?vsn=d") format("truetype"); }
+
+.fas,
+.fa-solid {
+  font-family: 'Font Awesome 6 Pro';
+  font-weight: 900; }
