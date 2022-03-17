@@ -1,7 +1,3 @@
-# site
-Front site of salsa.financial
-
-
 # Salsa Site
 
 To start your Phoenix server:
